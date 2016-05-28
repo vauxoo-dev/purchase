@@ -76,6 +76,7 @@
                                                 <field name="schedule_date" attrs="{'readonly': [('state','not in',('draft'))]}"/>
                                                 <field name="picking_type_id" widget="selection" groups="stock.group_locations" attrs="{'readonly': [('state','not in',('draft'))]}"/>
                                                 <field name="company_id" groups="base.group_multi_company" widget="selection" attrs="{'readonly': [('state','not in',('draft'))]}"/>
+                                                <field name="stock_to"/>
                                             </group>
                                         </div>
                                         <div class="col-md-6">
@@ -101,7 +102,6 @@
                                         <field name="product_qty" string="Qty"/>
                                         <field name="stock"/>
                                         <field name="forecast_qty"/>
-                                        <field name="stock_to"/>
                                         <field name="consolidated_price"/>
                                         <field name="schedule_date" string="Scheduled"/>
                                         <field name="account_analytic_id" groups="purchase.group_analytic_accounting" string="Analytic"/>
