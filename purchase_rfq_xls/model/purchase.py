@@ -67,7 +67,7 @@ class PurchaseOrder(models.Model):
     @api.model
     def _get_xls(self):
         html = self.env['report'].get_html(
-            self,
+            self.ids,
             'purchase_rfq_xls.report_template',
             data={'ids': self.ids, 'form': {}}
         )

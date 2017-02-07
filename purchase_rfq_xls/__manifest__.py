@@ -39,6 +39,7 @@
     "demo": [],
     "data": [
         "view/wizard.xml",
+        "report/report_view.xml",
         "report/layouts.xml",
         "report/template.xml",
         "view/report.xml",

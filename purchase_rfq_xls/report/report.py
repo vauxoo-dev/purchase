@@ -21,20 +21,21 @@
 ###############################################################################
 from datetime import datetime
 
-from openerp.osv import osv
-from openerp.report import report_sxw
+from odoo import models, api
 
 
-class Parser(report_sxw.rml_parse):
-    def __init__(self, cr, uid, name, context):
-        super(Parser, self).__init__(cr, uid, name, context=context)
-        self.localcontext.update({
-            'datetime': datetime,
-        })
-
-
-class PurchaseQuotationReportXLS(osv.AbstractModel):
+class PurchaseQuotationReportXLS(models.AbstractModel):
     _name = 'report.purchase_rfq_xls.report_template'
-    _inherit = 'report.abstract_report'
-    _template = 'purchase_rfq_xls.report_template'
-    _wrapped_report_class = Parser
+
+    @api.multi
+    def render_html(self, docids, data=None):
+        print data
+        docargs = {
+            'doc_ids': docids,
+            'doc_model': 'purchase.order',
+            'docs': self.env['purchase.order'].browse(docids),
+            'data': data,
+            'datetime': datetime,
+        }
+        return self.env['report'].render(
+            'purchase_rfq_xls.report_template', docargs)

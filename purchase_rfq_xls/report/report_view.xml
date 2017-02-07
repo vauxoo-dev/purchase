@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            string="Purchase RFQ"
+            id="action_report_purchase_rfq"
+            model="purchase.order"
+            name="purchase_rfq_xls.report_template"
+            file="purchase_rfq_xls.report_template"
+            report_type="qweb-pdf"
+        />
+
+    </data>
+</odoo>

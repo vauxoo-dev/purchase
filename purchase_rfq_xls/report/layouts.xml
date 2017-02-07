@@ -9,7 +9,6 @@
         <attribute name="t-att-data-report-dpi">data_report_dpi if data_report_dpi else None</attribute>
     </xpath>
     <!-- Remove conflicting style -->
-    <xpath expr="//head/link[@href='/web/static/src/css/full.css']" position="replace"></xpath>
 </template>
 
 <template id="purchase_rfq_xls.html_container">

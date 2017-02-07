@@ -35,7 +35,7 @@
                                 <th>Order Date</th>
                                 <th><span t-field="o.date_order" t-field-options='{"format": "dd/MM/yyyy"}'/></th>
                                 <th>Expected Date</th>
-                                <th><span t-field="o.minimum_planned_date" t-field-options='{"format": "dd/MM/yyyy"}'/></th>
+                                <th><span t-field="o.date_planned" t-field-options='{"format": "dd/MM/yyyy"}'/></th>
                                 <th>Warehouse</th>
                                 <th><span t-field="o.picking_type_id.warehouse_id.name"/></th>
                             </tr>
@@ -100,9 +100,11 @@
 
         <template id="report_template">
             <t t-call="purchase_rfq_xls.html_container">
-                <t t-set="doc_id" t-value="doc_ids[0]"/>
-                <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'purchase_rfq_xls.report_document')"/>
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="purchase_rfq_xls.report_document" t-lang="o.partner_id.lang"/>
+                </t>
             </t>
+
         </template>
     </data>
 </openerp>
