@@ -28,14 +28,14 @@
                             <page string="General Information">
                                 <div class="oe_left_space">
                                     <div class="oe_right oe_button_box">
-                                        <button name="%(purchase_requisition.action_purchase_requisition_partner)d" type="action"
-                                                string="Request a Quotation"
+                                        <button name="%(purchase_requisition.action_purchase_requisition_to_so)d" type="action"
+                                                string="New Quotation"
                                                 attrs="{'invisible': ['|', ('line_ids','=',[]),('state', 'in', ('draft' ,'open','done'))]}"
                                                 class="oe_stat_button"
                                                 icon="fa-gear"/>
                                         <button name="open_product_line" type="object"
                                                 string="View Products Lines"
-                                                attrs="{'invisible': ['|', ('state', 'not in', ('open','done')), ('exclusive', '=', 'exclusive')]}"
+                                                attrs="{'invisible': [('state', 'not in', ('open','done'))]}"
                                                 class="oe_stat_button"
                                                 icon="fa-align-justify"
                                                 groups="purchase.group_advance_bidding"/>
@@ -57,8 +57,6 @@
                                     <div class="row">
                                         <div class="col-md-5" style="border-right: 1px solid #eee;">
                                             <group string="0.- Options">
-                                                <field name="exclusive" string="Exclusive" attrs="{'readonly': [('state','not in',('draft'))]}"/>
-                                                <field name="multiple_rfq_per_supplier" attrs="{'readonly': [('state','not in',('draft'))]}"/>
                                                 <field name="advantage_discount"/>
                                             </group>
                                         </div>
@@ -114,8 +112,6 @@
                                         <field name="date_order" string="Order Date"/>
                                         <field name="partner_id"/>
                                         <field name="company_id" groups="base.group_multi_company" widget="selection"/>
-                                        <field name="location_id" groups="stock.group_locations"/>
-                                        <field name="minimum_planned_date" invisible="1"/>
                                         <field name="origin"/>
                                         <field name="state"/>
                                         <button name="purchase_cancel" states="draft,confirmed,wait_auth" string="Cancel Purchase Order" icon="gtk-cancel"/>
@@ -128,9 +124,9 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string="Purchase Lines">
-                                <field name="po_line_ids"/>
-                            </page>
+                            <!-- <page string="Purchase Lines"> -->
+                            <!--     <field name="po_line_ids"/> -->
+                            <!-- </page> -->
                             <page string="Terms and Conditions">
                                 <field name="description" attrs="{'readonly': [('state','not in',('draft'))]}"/>
                             </page>
@@ -147,10 +143,10 @@
                 </form>
             </field>
         </record>
-        <record id="purchase_order_line_tree_tender" model="ir.ui.view">
+        <record id="purchase_order_line_tree" model="ir.ui.view">
             <field name="name">purchase.order.line.tree.tender</field>
             <field name="model">purchase.order.line</field>
-            <field name="inherit_id" ref="purchase_requisition.purchase_order_line_tree_tender"/>
+            <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
             <field eval="1" name="priority"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='price_unit']" position="after">
@@ -185,7 +181,7 @@
         </record>
         <!-- reordering menus necesary to be consistent in the workflow proposed by this console.
              -->
-        <record id="base.menu_procurement_management_supplier_name" model="ir.ui.menu">
+        <record id="purchase.menu_procurement_management_supplier_name" model="ir.ui.menu">
             <field name="sequence">0</field>
         </record>
         <record id="purchase_requisition.menu_purchase_requisition_pro_mgt" model="ir.ui.menu">

@@ -40,7 +40,7 @@ class PurchaseRequisition(models.Model):
         # when iterated.
         return partners.sorted(key=attrgetter('name'))
 
-    @api.depends('exclusive', 'purchase_ids', 'line_ids')
+    @api.depends('purchase_ids', 'line_ids')
     def _compute_suppliers(self):
         """Given a set of purchase products in a bid, compute the partners that
         should be called on such bid.
@@ -198,7 +198,9 @@ class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
     # TODO: Use new api here?
-    def _run(self, cr, uid, procurement, context=None):
+    @api.multi
+    def _run(self):
+        procurement = self
         requisition_obj = self.pool.get('purchase.requisition')
         warehouse_obj = self.pool.get('stock.warehouse')
         if procurement.rule_id and procurement.rule_id.action == 'buy' \
@@ -206,12 +208,12 @@ class ProcurementOrder(models.Model):
             # Not done yet anything, TODO: logic to select the warehouse, it
             # cannot be just the first.
             warehouse_id = warehouse_obj.search(
-                cr, uid, [('company_id', '=', procurement.company_id.id)],
-                context=context)
-            requisition_id = requisition_obj.create(cr, uid, {
+                [('company_id', '=', procurement.company_id.id)],
+                )
+            requisition_id = requisition_obj.create({
                 'origin': procurement.origin,
                 'date_end': procurement.date_planned,
-                'warehouse_id': warehouse_id and warehouse_id[0] or False,
+                'warehouse_id': warehouse_id and warehouse_id[0].id or False,
                 'company_id': procurement.company_id.id,
                 'procurement_id': procurement.id,
                 'picking_type_id': procurement.rule_id.picking_type_id.id,
@@ -222,13 +224,11 @@ class ProcurementOrder(models.Model):
 
                 })],
             })
-            self.message_post(cr, uid, [procurement.id], body=_(
-                "Purchase Requisition created"), context=context)
-            return self.write(cr, uid, [procurement.id],
-                              {'requisition_id': requisition_id},
-                              context=context)
-        return super(ProcurementOrder, self)._run(
-            cr, uid, procurement, context=context)
+            procurement.message_post(body=_(
+                "Purchase Requisition created"))
+            return procurement.write(
+                {'requisition_id': requisition_id})
+        return super(ProcurementOrder, self)._run()
 
 
 class PurchaseOrderLine(models.Model):
@@ -322,13 +322,13 @@ class PurchaseOrderLine(models.Model):
             line.price_bid = line.last_price * \
                 (1 - line.order_id.requisition_id.advantage_discount)
 
-    price_bid = fields.Float(digits_compute=precision,
+    price_bid = fields.Float(digits=precision,
                              help="Technical field: for not loosing the price"
                              "used for the bid, which can be generally a"
                              "little percentage less than the actual computed"
                              "one.",
                              compute="_compute_prices")
-    last_price = fields.Float(digits_compute=precision,
+    last_price = fields.Float(digits=precision,
                               help="Technical field: It will represent the "
                               "more little one between the last purchase  "
                               "to this supplier and the last purchase actually"
@@ -336,7 +336,7 @@ class PurchaseOrderLine(models.Model):
                               "will be the same than the last one, if never"
                               " bought at all this will be 0",
                               compute="_compute_prices")
-    accounting_cost = fields.Float('Acc', digits_compute=precision,
+    accounting_cost = fields.Float('Acc', digits=precision,
                                    help="Technical field: it will represent "
                                    "the more the actual standard cost in the "
                                    "product (the accounting one) used as"
@@ -386,7 +386,7 @@ class PurchaseRequisitionLine(models.Model):
             req.consolidated_price = self._get_consolidated_price(req)
 
     @api.multi
-    @api.depends('requisition_id', 'requisition_id.po_line_ids')
+    @api.depends('requisition_id', 'requisition_id.purchase_ids.order_line')
     def _compute_po_line(self):
         """In order to return purchase_order_lines filtered by
             product_id = requisition_line.product_id
@@ -395,7 +395,8 @@ class PurchaseRequisitionLine(models.Model):
         for line in self:
             # Requisition_id.po_line_ids already has all purchases_order_lines
             # of all purchase orders related to requisition_id
-            po_line_ids = line.requisition_id.po_line_ids.filtered(
+            po_line_ids = line.requisition_id.purchase_ids.mapped(
+                'order_line').filtered(
                 lambda r: r.product_id == line.product_id and
                 r.order_id.state not in excluded)
             line.po_line_ids = po_line_ids
