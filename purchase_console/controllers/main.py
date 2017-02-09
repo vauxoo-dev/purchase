@@ -9,8 +9,8 @@
 #    planned by: Nhomar Hernandez <nhomar@vauxoo.com>
 ############################################################################
 
-from openerp import http
-from openerp.http import request
+from odoo import http
+from odoo.http import request
 
 
 class Console(http.Controller):
@@ -32,7 +32,7 @@ class Console(http.Controller):
             max_po_line_ids = len(requisition.supplier_ids)
             po_lines_width = int(12.00/max_po_line_ids)
 
-        return http.request.render('purchase_console.requisition', {
+        return request.render('purchase_console.requisition', {
             'requisition': requisition,
             'po_lines_width': po_lines_width,
             'po_lines_number': max_po_line_ids,
@@ -66,11 +66,9 @@ class Console(http.Controller):
         '/update/line/<model("purchase.order.line"):line>',
         auth='user', type="json")
     def update_line(self, line, **data):
-        pol = request.registry('purchase.order.line')
-        cr, uid, context = request.cr, request.uid, request.context
         res = {'result': False}
         try:
-            pol.update_line(cr, uid, line.id, data, context=context)
+            line.update_line(data)
             res['result'] = True
         except ValueError as e:
             res['result'] = False
@@ -81,12 +79,10 @@ class Console(http.Controller):
         '/purchase_console/order_approve/',
         auth='user', type="json")
     def purchase_order_approve(self, order_id, **data):
-        cr, uid, context = request.cr, request.uid, request.context
-        purchase_obj = request.registry('purchase.order')
+        purchase_obj = request.env['purchase.order']
         res = {'result': False}
         try:
-            purchase_obj.signal_workflow(
-                cr, uid, [order_id], 'purchase_approve', context=context)
+            purchase_obj.browse(order_id).button_approve()
             res['result'] = True
         except ValueError as e:
             res['result'] = False
@@ -97,11 +93,10 @@ class Console(http.Controller):
         '/purchase_console/action-line/',
         auth='user', type="json")
     def purchase_order_line_confirm(self, line_id, **data):
-        cr, uid, context = request.cr, request.uid, request.context
-        pol = request.registry('purchase.order.line')
+        pol = request.env['purchase.order.line']
         res = {'result': False}
         try:
-            pol.update_line(cr, uid, line_id, data, context=context)
+            pol.browse(line_id).update_line(data)
             res['result'] = True
         except ValueError as e:
             res['result'] = False
@@ -112,15 +107,14 @@ class Console(http.Controller):
         '/purchase_console/remove-line/',
         auth='user', type="json")
     def purchase_order_line_unlik(self, line_id, **data):
-        cr, uid, context = request.cr, request.uid, request.context
-        pol = request.registry('purchase.order.line')
-        return pol.unlink(cr, uid, [line_id], context=context)
+        pol = request.env['purchase.order.line']
+        return pol.unlink([line_id])
 
     @http.route(
         ['/shop/purchase_order_modal/<model("purchase.order"):order>'],
         type='json', auth="public", methods=['POST'], website=True)
     def modal(self, order, **data):
-        return request.website._render(
+        return request.render(
             "purchase_console.purchase_order_modal",
             {'order': order,
              })
@@ -129,7 +123,7 @@ class Console(http.Controller):
         ['/shop/modal_msg_error/'],
         type='json', auth="public", methods=['POST'], website=True)
     def modal_message(self, message, **data):
-        return request.website._render(
+        return request.render(
             "purchase_console.message_modal",
             {'message': message,
              })

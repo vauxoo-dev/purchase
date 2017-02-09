@@ -30,12 +30,12 @@ class MailComposer(models.TransientModel):
     _name = 'mail.compose.message'
     _inherit = 'mail.compose.message'
 
-    @api.model
-    def get_mail_values(self, wizard, res_ids):
+    @api.multi
+    def get_mail_values(self, res_ids):
         att_ids = self.env.context.get('extra_attachments')
         if att_ids:
-            wizard.write({'attachment_ids': [(4, i) for i in att_ids]})
-        return super(MailComposer, self).get_mail_values(wizard, res_ids)
+            self.write({'attachment_ids': [(4, i) for i in att_ids]})
+        return super(MailComposer, self).get_mail_values(res_ids)
 
 
 class PurchaseOrder(models.Model):

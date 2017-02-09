@@ -4,7 +4,7 @@
         <template id="assets_backend" name="purchase requisition assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/purchase_console/static/css/console.css"/>
-                <script type="text/javascript" src="/purchase_console/static/js/web_widget_one2many_console.js"></script>
+                <!-- <script type="text/javascript" src="/purchase_console/static/js/web_widget_one2many_console.js"></script> -->
             </xpath>
         </template>
 

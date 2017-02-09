@@ -327,7 +327,7 @@ class PurchaseOrderLine(models.Model):
                              "used for the bid, which can be generally a"
                              "little percentage less than the actual computed"
                              "one.",
-                             compute="_compute_prices")
+                             compute="_compute_prices", multi='last_price')
     last_price = fields.Float(digits=precision,
                               help="Technical field: It will represent the "
                               "more little one between the last purchase  "
@@ -335,7 +335,7 @@ class PurchaseOrderLine(models.Model):
                               " done. If never bought to this  supplier this "
                               "will be the same than the last one, if never"
                               " bought at all this will be 0",
-                              compute="_compute_prices")
+                              compute="_compute_prices", multi='last_price')
     accounting_cost = fields.Float('Acc', digits=precision,
                                    help="Technical field: it will represent "
                                    "the more the actual standard cost in the "
