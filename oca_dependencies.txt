@@ -1,4 +1,2 @@
 forecast https://github.com/vauxoo-dev/forecast.git jose-10-yoytec-migration
 web https://github.com/Vauxoo/web.git
-stock-logistics-workflow https://github.com/Vauxoo/stock-logistics-workflow.git
-product-attribute https://github.com/Vauxoo/product-attribute.git
